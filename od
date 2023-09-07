@@ -1,0 +1,68 @@
+<style>
+* { margin: 0; padding: 0; }
+html { height: 100%; }
+body {font-size: 16px;font-family:'Open Sans', sans-serif;height: 100%;position: relative;margin-left: 5px;}
+cabecera { background-color: rgba(0,16,27,.85); height: 40px; width: 30%;padding-left: 10px;padding-top: 10px; position: absolute; z-index: 200; box-shadow: 0px 2px 3px #333333;}
+cabecera > h1, a, a:visited {display: inline;color: #FFFFFF;font-family: 'Open Sans', sans-serif;font-size: 1.3em;font-weight: bold;/*float: right;*/margin-top: 10px;margin-right: 10px;text-decoration: none;}
+#mapa {background: transparent;height: 400px;width: 29%;top: 60px;left: 0;right: 0;bottom: 0;margin-left: 13px;}
+#informacion {position: absolute;background: rgba(0,16,27,.85);z-index: 200;top: 48%;width: 30%;padding-bottom: 10px;padding-left: 10px;padding-top: 10px;
+}
+#informacion h2,#informacion h3 { color: #FFFFFF; text-shadow: 1px 1px 1px #000000; font-weight: normal; font-size: .9em; }
+#informacion h2 { font-size: 1.1em; margin-bottom: 10px; }
+#informacion h3 span { color: #FF5555; }
+</style>
+<meta charset="UTF-8">
+<link href='http://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css' />
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script type='text/javascript' src='https://maps.googleapis.com/maps/api/js?sensor=true'></script>
+<script language='JavaScript' type='text/javascript'>
+	function informacion (coordenadas) {
+		$('#latitude').html(coordenadas.Lat);
+		$('#longitude').html(coordenadas.Lng)
+	}
+	function initialize() {
+		var coordenadas = {
+			Lat: 0,
+			Lng: 0
+		};
+		
+		function localizacion (posicion) {
+			coordenadas = {
+				Lat: posicion.coords.latitude,
+				Lng: posicion.coords.longitude
+			}
+			informacion(coordenadas);
+			var mapOptions = {
+				zoom: 17,
+				center: new google.maps.LatLng(coordenadas.Lat, coordenadas.Lng),
+				disableDefaultUI: true,
+				mapTypeId: google.maps.MapTypeId.ROADMAP
+			}
+			var map = new google.maps.Map(document.getElementById('mapa'), mapOptions);
+			var infowindow = new google.maps.InfoWindow({
+				map: map,
+				position: new google.maps.LatLng(coordenadas.Lat, coordenadas.Lng),
+				content: 'Ubicación de emergencia'
+            });
+		}
+		function errores (error) {
+			alert('Ha ocurrido un error al obtener la información');
+		}
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(localizacion,errores);
+		} else {
+			alert('Tu navegador no soporta la Geolocalización');
+		}
+	}
+</script>
+<body onload='initialize()'>
+<cabecera>
+		<h1>Localización </h1><a href='http://qraid.tk' target='new'>QR[Aid]</a>
+	</cabecera>
+<section id='informacion'>
+		<h2>Posición actual:</h2>
+		<h3>Latitud: <span id='latitude'></span></h3>
+		<h3>Longitud:<span id='longitude'></span></h3>
+	</section>
+	<section id='mapa'></section>
+</body>
